@@ -11,12 +11,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.github.rtyvz.senla.tr.rick_and_morty.App
 import com.github.rtyvz.senla.tr.rick_and_morty.R
+import com.github.rtyvz.senla.tr.rick_and_morty.common.PaginationScrollListener
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.TasksProvider
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
+import java.util.Collections.emptyList
 
 class CharacterListFragment : Fragment() {
     private lateinit var characterRecyclerView: RecyclerView
@@ -27,6 +30,8 @@ class CharacterListFragment : Fragment() {
     }
     private var progress: ProgressDialog? = null
     private var pageForLoad = 1
+    private var isLoading = false
+    private var isLastPage = false
 
     companion object {
         val TAG: String = CharacterListFragment::class.simpleName.toString()
@@ -89,6 +94,8 @@ class CharacterListFragment : Fragment() {
     private fun initCharacterListReceiver() {
         characterListReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
+                pageForLoad++
+                isLoading = false
                 progress?.dismiss()
                 val data =
                     intent?.getParcelableArrayListExtra<CharacterEntity>(EXTRA_CHARACTER_LIST)
@@ -102,6 +109,18 @@ class CharacterListFragment : Fragment() {
     private fun initRecycler(view: View) {
         characterRecyclerView = view.findViewById(R.id.characterList)
         characterRecyclerView.adapter = characterAdapter
+        characterRecyclerView.addOnScrollListener(object : PaginationScrollListener(
+            characterRecyclerView.layoutManager as LinearLayoutManager
+        ) {
+            override fun isLoading() = isLoading
+
+            override fun loadMoreItems() {
+                isLoading = true
+                TasksProvider.provideTaskForLoadCharacters(pageForLoad)
+            }
+
+            override fun isLastPage() = isLastPage
+        })
     }
 
     fun checkRunningTask() {
