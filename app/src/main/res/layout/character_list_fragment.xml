@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/characterList"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/small_padding"
+    tools:listitem="@layout/character_item"
+    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+    tools:context=".ui.main.CharactersActivity">
+
+</androidx.recyclerview.widget.RecyclerView>
