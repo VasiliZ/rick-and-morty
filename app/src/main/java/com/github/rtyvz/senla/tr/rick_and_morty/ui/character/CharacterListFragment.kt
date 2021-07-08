@@ -116,6 +116,7 @@ class CharacterListFragment : Fragment() {
 
             override fun loadMoreItems() {
                 isLoading = true
+                characterAdapter.appLoading()
                 TasksProvider.provideTaskForLoadCharacters(pageForLoad)
             }
 

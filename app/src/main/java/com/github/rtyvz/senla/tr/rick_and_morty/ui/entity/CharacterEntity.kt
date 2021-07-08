@@ -5,9 +5,9 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class CharacterEntity(
-    val id: Long,
-    val name: String,
-    val status: String,
-    val gender: String,
-    val image: String
-):Parcelable
+    val id: Long? = null,
+    val name: String? = null,
+    val status: String? = null,
+    val gender: String? = null,
+    val image: String? = null
+) : Parcelable

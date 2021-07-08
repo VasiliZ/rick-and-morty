@@ -13,29 +13,56 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 
 class CharacterAdapter(private val glide: RequestManager) :
-    RecyclerView.Adapter<CharacterAdapter.CharacterHolder>() {
+    RecyclerView.Adapter<CharacterAdapter.BaseViewHolder>() {
     private val characterList = mutableListOf<CharacterEntity>()
+    private var isLoaderVisible = false
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-        CharacterHolder(
-            glide,
-            LayoutInflater.from(parent.context)
-                .inflate(R.layout.character_item, parent, false)
-        )
+    companion object {
+        private const val LOADING_VIEW_TYPE = 0
+        private const val DATA_VIEW_TYPE = 1
+    }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return when (viewType) {
+            DATA_VIEW_TYPE -> CharacterHolder(
+                glide,
+                LayoutInflater.from(parent.context)
+                    .inflate(R.layout.character_item, parent, false)
+            )
+            else -> {
+                LoadingViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.progress_item, parent, false)
+                )
+            }
+        }
+    }
 
-    override fun onBindViewHolder(holder: CharacterHolder, position: Int) {
+    override fun getItemViewType(position: Int): Int {
+        return when (position) {
+            characterList.size - 1 -> LOADING_VIEW_TYPE
+            else -> DATA_VIEW_TYPE
+        }
+    }
+
+    override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder.bind(characterList[position])
     }
 
     override fun getItemCount() = characterList.size
 
-    override fun onViewRecycled(holder: CharacterHolder) {
+    fun appLoading() {
+        isLoaderVisible = true
+        characterList.add(CharacterEntity())
+        notifyItemInserted(characterList.size - 1)
+    }
+
+    override fun onViewRecycled(holder: BaseViewHolder) {
         holder.cleanUp()
     }
 
     class CharacterHolder(private val glide: RequestManager, private val view: View) :
-        RecyclerView.ViewHolder(view) {
+        BaseViewHolder(view) {
         private lateinit var image: ShapeableImageView
         private lateinit var nameTextView: MaterialTextView
         private lateinit var genderTextView: MaterialTextView
@@ -47,7 +74,7 @@ class CharacterAdapter(private val glide: RequestManager) :
             private const val DEAD_STATUS = "Dead"
         }
 
-        fun bind(data: CharacterEntity) {
+        override fun bind(data: CharacterEntity) {
             image = view.findViewById(R.id.characterImage)
             nameTextView = view.findViewById(R.id.characterName)
             genderTextView = view.findViewById(R.id.genderTextView)
@@ -75,7 +102,7 @@ class CharacterAdapter(private val glide: RequestManager) :
             )
         }
 
-        fun cleanUp() {
+        override fun cleanUp() {
             glide.clear(image)
         }
     }
@@ -83,5 +110,19 @@ class CharacterAdapter(private val glide: RequestManager) :
     fun setData(data: List<CharacterEntity>) {
         characterList.addAll(data)
         notifyDataSetChanged()
+    }
+
+    class LoadingViewHolder(view: View) : BaseViewHolder(view) {
+        override fun bind(data: CharacterEntity) {
+        }
+
+        override fun cleanUp() {
+        }
+
+    }
+
+    abstract class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        abstract fun bind(data: CharacterEntity)
+        abstract fun cleanUp()
     }
 }
