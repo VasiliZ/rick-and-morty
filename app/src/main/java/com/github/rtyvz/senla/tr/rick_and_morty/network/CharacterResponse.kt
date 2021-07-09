@@ -13,9 +13,13 @@ data class CharacterResponse(
     @SerializedName("gender")
     val gender: String,
     @SerializedName("image")
-    val image: String
+    val image: String,
+    @SerializedName("type")
+    val type: String,
+    @SerializedName("location")
+    val location: Location
 ) {
     fun toCharacterEntity(): CharacterEntity {
-        return CharacterEntity(id, name, status, gender, image)
+        return CharacterEntity(id, name, status, gender, image, type, location)
     }
 }

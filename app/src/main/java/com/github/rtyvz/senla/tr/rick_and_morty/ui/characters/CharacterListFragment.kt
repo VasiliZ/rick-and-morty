@@ -1,4 +1,4 @@
-package com.github.rtyvz.senla.tr.rick_and_morty.ui.character
+package com.github.rtyvz.senla.tr.rick_and_morty.ui.characters
 
 import android.app.ProgressDialog
 import android.content.BroadcastReceiver
@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,24 +20,33 @@ import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.common.PaginationScrollListener
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.TasksProvider
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
+import com.google.android.material.textview.MaterialTextView
 import java.util.Collections.emptyList
 
 class CharacterListFragment : Fragment() {
     private lateinit var characterRecyclerView: RecyclerView
+    private lateinit var errorTextView: MaterialTextView
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private lateinit var characterListReceiver: BroadcastReceiver
+    private lateinit var characterLoadingErrorReceiver: BroadcastReceiver
     private val characterAdapter by lazy {
-        CharacterAdapter(Glide.with(this))
+        CharacterAdapter(Glide.with(this)) {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.characterListContainer, ParticularCharacterFragment.newInstance(it))
+                .addToBackStack(null)
+                .commit()
+        }
     }
     private var progress: ProgressDialog? = null
-    private var pageForLoad = 1
     private var isLoading = false
     private var isLastPage = false
 
     companion object {
         val TAG: String = CharacterListFragment::class.simpleName.toString()
         const val BROADCAST_CHARACTER_LIST = "local:BROADCAST_CHARACTER_LIST"
+        const val BROADCAST_CHARACTER_LOADING_ERROR = "local:BROADCAST_CHARACTER_LOADING_ERROR"
         const val EXTRA_CHARACTER_LIST = "CHARACTER_LIST"
+        const val EXTRA_CHARACTER_LOADING_ERROR = "CHARACTER_LOADING_ERROR"
     }
 
     override fun onCreateView(
@@ -51,28 +61,32 @@ class CharacterListFragment : Fragment() {
 
         localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
 
+        errorTextView = view.findViewById(R.id.errorTextView)
         initRecycler(view)
         initProgress()
         initCharacterListReceiver()
+        initLoadingErrorReceiver()
     }
 
     override fun onResume() {
         super.onResume()
 
-        val state = App.state
+        val state = App.INSTANCE.state
         if (state != null) {
             if (!state.isCharacterTaskRunning && state.data.isEmpty()) {
                 progress?.show()
-                TasksProvider.provideTaskForLoadCharacters(pageForLoad)
+                TasksProvider.provideTaskForLoadCharacters(state.page)
             } else {
                 progress?.dismiss()
                 characterAdapter.setData(state.data)
             }
         }
 
-        characterRecyclerView.layoutManager?.onRestoreInstanceState(App.state?.characterRecyclerState)
+        characterRecyclerView
+            .layoutManager?.onRestoreInstanceState(App.INSTANCE.state?.characterRecyclerState)
 
         registerCharacterReceiver()
+        registerLoadingErrorReceiver()
     }
 
     private fun initProgress() {
@@ -91,17 +105,49 @@ class CharacterListFragment : Fragment() {
         )
     }
 
+    private fun registerLoadingErrorReceiver() {
+        localBroadcastManager.registerReceiver(
+            characterLoadingErrorReceiver, IntentFilter(
+                BROADCAST_CHARACTER_LOADING_ERROR
+            )
+        )
+    }
+
     private fun initCharacterListReceiver() {
         characterListReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                pageForLoad++
-                isLoading = false
-                progress?.dismiss()
-                val data =
-                    intent?.getParcelableArrayListExtra<CharacterEntity>(EXTRA_CHARACTER_LIST)
-                        ?: emptyList()
-                App.state?.data?.addAll(data)
-                characterAdapter.setData(data)
+                val state = App.INSTANCE.state
+
+                if (state != null) {
+                    isLoading = false
+                    progress?.dismiss()
+                    val data =
+                        intent?.getParcelableArrayListExtra<CharacterEntity>(EXTRA_CHARACTER_LIST)
+                            ?: emptyList()
+
+                    if (state.page > 1) {
+                        characterAdapter.removeLoading()
+                    }
+
+                    state.page++
+                    App.INSTANCE.state?.data?.addAll(data)
+                    characterAdapter.setData(data)
+                }
+            }
+        }
+    }
+
+    private fun initLoadingErrorReceiver() {
+        characterLoadingErrorReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val state = App.INSTANCE.state
+                if (state != null) {
+                    errorTextView.isVisible = true
+                    characterRecyclerView.isVisible = false
+                    errorTextView.text = intent?.getStringExtra(EXTRA_CHARACTER_LOADING_ERROR)
+                    isLoading = false
+                    progress?.dismiss()
+                }
             }
         }
     }
@@ -115,9 +161,12 @@ class CharacterListFragment : Fragment() {
             override fun isLoading() = isLoading
 
             override fun loadMoreItems() {
-                isLoading = true
-                characterAdapter.appLoading()
-                TasksProvider.provideTaskForLoadCharacters(pageForLoad)
+                val state = App.INSTANCE.state
+                if (state != null && state.pageCount <= state.page) {
+                    isLoading = true
+                    characterAdapter.appLoading()
+                    TasksProvider.provideTaskForLoadCharacters(state.page)
+                }
             }
 
             override fun isLastPage() = isLastPage
@@ -125,7 +174,7 @@ class CharacterListFragment : Fragment() {
     }
 
     fun checkRunningTask() {
-        if (App.state?.isCharacterTaskRunning == false) {
+        if (App.INSTANCE.state?.isCharacterTaskRunning == false) {
             progress?.show()
         } else {
             progress?.dismiss()
@@ -134,7 +183,8 @@ class CharacterListFragment : Fragment() {
 
     override fun onPause() {
         localBroadcastManager.unregisterReceiver(characterListReceiver)
-        App.state?.characterRecyclerState =
+        localBroadcastManager.unregisterReceiver(characterLoadingErrorReceiver)
+        App.INSTANCE.state?.characterRecyclerState =
             characterRecyclerView.layoutManager?.onSaveInstanceState()
 
         super.onPause()

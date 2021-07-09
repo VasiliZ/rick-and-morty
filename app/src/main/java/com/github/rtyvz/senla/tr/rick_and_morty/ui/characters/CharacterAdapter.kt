@@ -1,4 +1,4 @@
-package com.github.rtyvz.senla.tr.rick_and_morty.ui.character
+package com.github.rtyvz.senla.tr.rick_and_morty.ui.characters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +12,10 @@ import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 
-class CharacterAdapter(private val glide: RequestManager) :
+class CharacterAdapter(
+    private val glide: RequestManager,
+    private val click: (Long?) -> (Unit)
+) :
     RecyclerView.Adapter<CharacterAdapter.BaseViewHolder>() {
     private val characterList = mutableListOf<CharacterEntity>()
     private var isLoaderVisible = false
@@ -24,11 +27,17 @@ class CharacterAdapter(private val glide: RequestManager) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
-            DATA_VIEW_TYPE -> CharacterHolder(
-                glide,
-                LayoutInflater.from(parent.context)
-                    .inflate(R.layout.character_item, parent, false)
-            )
+            DATA_VIEW_TYPE -> {
+                CharacterHolder(
+                    glide,
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.character_item, parent, false)
+                ).apply {
+                    itemView.setOnClickListener {
+                        click(getItem(adapterPosition).id)
+                    }
+                }
+            }
             else -> {
                 LoadingViewHolder(
                     LayoutInflater.from(parent.context)
@@ -37,6 +46,10 @@ class CharacterAdapter(private val glide: RequestManager) :
             }
         }
     }
+
+    private fun getItem(position: Int) =
+        characterList[position]
+
 
     override fun getItemViewType(position: Int): Int {
         return when (position) {
@@ -57,6 +70,12 @@ class CharacterAdapter(private val glide: RequestManager) :
         notifyItemInserted(characterList.size - 1)
     }
 
+    fun removeLoading() {
+        isLoaderVisible = false
+        characterList.removeAt(characterList.size - 1)
+        notifyItemRemoved(characterList.size - 1)
+    }
+
     override fun onViewRecycled(holder: BaseViewHolder) {
         holder.cleanUp()
     }
@@ -67,6 +86,8 @@ class CharacterAdapter(private val glide: RequestManager) :
         private lateinit var nameTextView: MaterialTextView
         private lateinit var genderTextView: MaterialTextView
         private lateinit var statusTextView: MaterialTextView
+        private lateinit var locationTextView: MaterialTextView
+        private lateinit var typeTextView: MaterialTextView
         private lateinit var statusImageView: ShapeableImageView
 
         companion object {
@@ -80,6 +101,8 @@ class CharacterAdapter(private val glide: RequestManager) :
             genderTextView = view.findViewById(R.id.genderTextView)
             statusImageView = view.findViewById(R.id.statusImageView)
             statusTextView = view.findViewById(R.id.statusTextView)
+            locationTextView = view.findViewById(R.id.locationTextView)
+            typeTextView = view.findViewById(R.id.characterTypeTextView)
 
             glide.load(data.image)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
@@ -100,11 +123,25 @@ class CharacterAdapter(private val glide: RequestManager) :
                     null
                 )
             )
+
+            if (data.type.isNullOrBlank()) {
+                typeTextView.visibility = View.GONE
+            } else {
+                typeTextView.visibility = View.VISIBLE
+                typeTextView.text =
+                    formatString(data.type, view, R.string.character_adapter_type)
+            }
+
+            locationTextView.text =
+                formatString(data.location?.name, view, R.string.character_adapter_location)
         }
 
         override fun cleanUp() {
             glide.clear(image)
         }
+
+        private fun formatString(value: String?, view: View, resourceId: Int) =
+            String.format(view.context.getString(resourceId), value)
     }
 
     fun setData(data: List<CharacterEntity>) {

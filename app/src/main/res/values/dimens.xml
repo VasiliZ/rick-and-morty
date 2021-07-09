@@ -8,7 +8,8 @@
     <dimen name="small_margin">8dp</dimen>
 
     <!--size-->
-    <dimen name="photo_height">350dp</dimen>
+    <dimen name="photo_height_normal">350dp</dimen>
+    <dimen name="photo_height_big">450dp</dimen>
     <dimen name="round_small_image_size">20dp</dimen>
 
     <!--text size-->

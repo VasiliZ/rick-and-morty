@@ -3,4 +3,8 @@
 
     <!--Character fragment-->
     <string name="character_list_fragment_wait_label">Wait please</string>
+    <string name="character_adapter_location">Location: %s</string>
+    <string name="character_adapter_type">Type: %s</string>
+    <string name="particulat_character_fragment_data_is_empty">Нет данных для отображения</string>
+    <string name="task_fetching_error">Не удалось загрузить данные</string>
 </resources>

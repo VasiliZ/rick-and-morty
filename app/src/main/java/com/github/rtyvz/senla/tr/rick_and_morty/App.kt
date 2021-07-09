@@ -7,9 +7,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class App : Application() {
+    var state: State? = null
 
     companion object {
-        var state: State? = null
         lateinit var INSTANCE: App
         lateinit var api: CharactersApi
         private lateinit var okHttpClient: OkHttpClient
