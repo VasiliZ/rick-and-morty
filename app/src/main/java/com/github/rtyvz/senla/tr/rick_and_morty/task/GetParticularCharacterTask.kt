@@ -33,7 +33,7 @@ class GetParticularCharacterTask {
                                 it.result?.toCharacterEntity()
                             )
                         })
-                return@Continuation null
+                return@Continuation InsertCharacterIntoDbTask().insertCharacter(it.result?.toCharacterEntity())
             }
         }, Task.UI_THREAD_EXECUTOR)
     }

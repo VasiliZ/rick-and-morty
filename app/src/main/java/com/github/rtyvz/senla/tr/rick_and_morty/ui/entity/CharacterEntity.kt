@@ -7,10 +7,10 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class CharacterEntity(
     val id: Long? = null,
-    val name: String? = null,
-    val status: String? = null,
-    val gender: String? = null,
     val image: String? = null,
+    val name: String? = null,
+    val gender: String? = null,
+    val status: String? = null,
     val type: String? = null,
-    val location: Location? = null
+    val location: String? = null
 ) : Parcelable

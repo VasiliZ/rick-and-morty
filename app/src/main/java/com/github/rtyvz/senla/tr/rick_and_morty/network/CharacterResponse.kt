@@ -20,6 +20,6 @@ data class CharacterResponse(
     val location: Location
 ) {
     fun toCharacterEntity(): CharacterEntity {
-        return CharacterEntity(id, name, status, gender, image, type, location)
+        return CharacterEntity(id, image, name, gender, status, type, location.name)
     }
 }

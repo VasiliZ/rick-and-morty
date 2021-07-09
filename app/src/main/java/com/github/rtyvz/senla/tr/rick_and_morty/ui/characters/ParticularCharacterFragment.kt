@@ -70,7 +70,7 @@ class ParticularCharacterFragment : Fragment() {
         initCharacterErrorReceiver()
         progress.isVisible = true
         groupView.isVisible = false
-        TasksProvider.getParticularCharacter(characterId)
+        val characterEntity = TasksProvider.getCharacter(characterId)
     }
 
     private fun initCharacterErrorReceiver() {
@@ -128,7 +128,7 @@ class ParticularCharacterFragment : Fragment() {
         nameTextView.text = character?.name
         genderTextView.text = character?.gender
         statusTextView.text = character?.status
-        locationTextView.text = character?.location?.name
+        locationTextView.text = character?.location
         typeTextView.text = character?.type
 
         statusImageView.setBackgroundColor(
@@ -153,7 +153,7 @@ class ParticularCharacterFragment : Fragment() {
         }
 
         locationTextView.text =
-            formatString(character?.location?.name, R.string.character_adapter_location)
+            formatString(character?.location, R.string.character_adapter_location)
     }
 
     private fun formatString(value: String?, resourceId: Int) =

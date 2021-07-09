@@ -133,7 +133,7 @@ class CharacterAdapter(
             }
 
             locationTextView.text =
-                formatString(data.location?.name, view, R.string.character_adapter_location)
+                formatString(data.location, view, R.string.character_adapter_location)
         }
 
         override fun cleanUp() {
