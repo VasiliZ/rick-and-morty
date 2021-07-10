@@ -62,6 +62,7 @@ class InsertValueHelper {
                 postfix = ""
             )
         )
+
         listArgs.forEachIndexed { index, value ->
             when (value) {
                 is String -> statement?.bindString(index + 1, value.toString())

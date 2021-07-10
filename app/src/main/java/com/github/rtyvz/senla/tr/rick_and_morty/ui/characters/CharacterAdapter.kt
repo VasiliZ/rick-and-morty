@@ -5,15 +5,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 
 class CharacterAdapter(
-    private val glide: RequestManager,
     private val click: (Long?) -> (Unit)
 ) :
     RecyclerView.Adapter<CharacterAdapter.BaseViewHolder>() {
@@ -29,7 +26,6 @@ class CharacterAdapter(
         return when (viewType) {
             DATA_VIEW_TYPE -> {
                 CharacterHolder(
-                    glide,
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.character_item, parent, false)
                 ).apply {
@@ -76,13 +72,8 @@ class CharacterAdapter(
         notifyItemRemoved(characterList.size - 1)
     }
 
-    override fun onViewRecycled(holder: BaseViewHolder) {
-        holder.cleanUp()
-    }
-
-    class CharacterHolder(private val glide: RequestManager, private val view: View) :
+    class CharacterHolder(private val view: View) :
         BaseViewHolder(view) {
-        private lateinit var image: ShapeableImageView
         private lateinit var nameTextView: MaterialTextView
         private lateinit var genderTextView: MaterialTextView
         private lateinit var statusTextView: MaterialTextView
@@ -96,7 +87,6 @@ class CharacterAdapter(
         }
 
         override fun bind(data: CharacterEntity) {
-            image = view.findViewById(R.id.characterImage)
             nameTextView = view.findViewById(R.id.characterName)
             genderTextView = view.findViewById(R.id.genderTextView)
             statusImageView = view.findViewById(R.id.statusImageView)
@@ -104,10 +94,6 @@ class CharacterAdapter(
             locationTextView = view.findViewById(R.id.locationTextView)
             typeTextView = view.findViewById(R.id.characterTypeTextView)
 
-            glide.load(data.image)
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .placeholder(R.drawable.ic_placeholder)
-                .into(image)
             nameTextView.text = data.name
             genderTextView.text = data.gender
             statusTextView.text = data.status
@@ -136,10 +122,6 @@ class CharacterAdapter(
                 formatString(data.location, view, R.string.character_adapter_location)
         }
 
-        override fun cleanUp() {
-            glide.clear(image)
-        }
-
         private fun formatString(value: String?, view: View, resourceId: Int) =
             String.format(view.context.getString(resourceId), value)
     }
@@ -152,14 +134,9 @@ class CharacterAdapter(
     class LoadingViewHolder(view: View) : BaseViewHolder(view) {
         override fun bind(data: CharacterEntity) {
         }
-
-        override fun cleanUp() {
-        }
-
     }
 
     abstract class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(data: CharacterEntity)
-        abstract fun cleanUp()
     }
 }

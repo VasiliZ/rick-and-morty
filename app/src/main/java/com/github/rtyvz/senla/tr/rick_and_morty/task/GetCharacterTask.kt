@@ -14,18 +14,15 @@ class GetCharacterTask {
         val localBroadcastManager = LocalBroadcastManager.getInstance(App.INSTANCE)
         Task.callInBackground {
             DbHelper().getCharacter(characterId)
-        }.onSuccess(Continuation<CharacterEntity?, CharacterEntity> {
-            return@Continuation it.result
-        }, Task.BACKGROUND_EXECUTOR)
-            .continueWith(Continuation {
-                if (it.isFaulted || it.result == null) {
-                    GetParticularCharacterTask().getCharacter(characterId)
-                } else {
-                    localBroadcastManager.sendBroadcastSync(Intent(ParticularCharacterFragment.BROADCAST_SINGLE_CHARACTER).apply {
-                        putExtra(ParticularCharacterFragment.EXTRA_SINGLE_CHARACTER, it.result)
-                    })
-                    return@Continuation null
-                }
-            }, Task.UI_THREAD_EXECUTOR)
+        }.onSuccessTask(Continuation<CharacterEntity?, Task<Nothing>> {
+            if (it.isFaulted || it.result == null) {
+                GetParticularCharacterTask().getCharacter(characterId)
+            } else {
+                localBroadcastManager.sendBroadcastSync(Intent(ParticularCharacterFragment.BROADCAST_SINGLE_CHARACTER).apply {
+                    putExtra(ParticularCharacterFragment.EXTRA_SINGLE_CHARACTER, it.result)
+                })
+            }
+            return@Continuation null
+        }, Task.UI_THREAD_EXECUTOR)
     }
 }

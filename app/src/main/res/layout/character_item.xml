@@ -12,18 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/characterImage"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/photo_height_normal"
-            android:scaleType="centerCrop"
-            app:layout_constraintBottom_toTopOf="@id/characterName"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_chainStyle="packed"
-            tools:src="@drawable/ic_placeholder" />
-
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/characterName"
             style="@style/TextViewStyle"
@@ -33,7 +21,7 @@
             app:layout_constraintBottom_toTopOf="@id/statusImageView"
             app:layout_constraintEnd_toStartOf="@id/genderTextView"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/characterImage"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Rick Sanchez" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -51,8 +39,8 @@
             android:id="@+id/statusImageView"
             android:layout_width="@dimen/round_small_image_size"
             android:layout_height="@dimen/round_small_image_size"
-            android:layout_marginBottom="@dimen/small_margin"
             android:layout_marginHorizontal="@dimen/small_margin"
+            android:layout_marginBottom="@dimen/small_margin"
             app:layout_constraintBottom_toTopOf="@id/characterTypeTextView"
             app:layout_constraintEnd_toStartOf="@id/statusTextView"
             app:layout_constraintStart_toStartOf="parent"
@@ -64,9 +52,9 @@
             style="@style/TextViewStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_margin"
             app:layout_constraintBottom_toBottomOf="@id/statusImageView"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginHorizontal="@dimen/small_margin"
             app:layout_constraintStart_toEndOf="@id/statusImageView"
             app:layout_constraintTop_toTopOf="@id/statusImageView"
             tools:text="Alive" />

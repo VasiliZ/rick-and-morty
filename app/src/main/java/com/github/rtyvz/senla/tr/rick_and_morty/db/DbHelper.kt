@@ -8,6 +8,11 @@ import java.util.*
 
 class DbHelper {
 
+    companion object {
+        private const val PERIOD_FOR_DELETE_1_DAY = "-1 day"
+        private const val CURRENT_TIME = "now"
+    }
+
     fun insertCharacter(character: CharacterEntity?) {
         if (character != null) {
             InsertValueHelper().apply {
@@ -30,7 +35,8 @@ class DbHelper {
     }
 
     fun deleteOldCharacters() {
-        val sql = "Delete from character where timestamp <= date('now', '-1 day')"
+        val sql =
+            "Delete from character where timestamp <= date('$CURRENT_TIME', '$PERIOD_FOR_DELETE_1_DAY')"
         DBProvider.provideDb().execSQL(sql)
     }
 

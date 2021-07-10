@@ -16,10 +16,7 @@ class LoadCharacterPageTask {
         Task.callInBackground {
             App.INSTANCE.state?.isCharacterTaskRunning = true
             App.api.getCharacters(pageId).execute().body()
-        }.onSuccess(Continuation<Response?, Response> {
-            return@Continuation it.result
-        }, Task.BACKGROUND_EXECUTOR)
-            .continueWith(Continuation<Response, Nothing> {
+        }.continueWith(Continuation<Response?, Nothing> {
                 if (it.isFaulted) {
                     App.INSTANCE.state?.isCharacterTaskRunning = false
                     localBroadcastManager
@@ -47,6 +44,7 @@ class LoadCharacterPageTask {
                                 )
                             })
                     App.INSTANCE.state?.isCharacterTaskRunning = false
+
                     return@Continuation null
                 }
             }, Task.UI_THREAD_EXECUTOR)

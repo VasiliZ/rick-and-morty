@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.github.rtyvz.senla.tr.rick_and_morty.App
 import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.common.PaginationScrollListener
@@ -30,7 +29,7 @@ class CharacterListFragment : Fragment() {
     private lateinit var characterListReceiver: BroadcastReceiver
     private lateinit var characterLoadingErrorReceiver: BroadcastReceiver
     private val characterAdapter by lazy {
-        CharacterAdapter(Glide.with(this)) {
+        CharacterAdapter {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.characterListContainer, ParticularCharacterFragment.newInstance(it))
                 .addToBackStack(null)
@@ -39,7 +38,6 @@ class CharacterListFragment : Fragment() {
     }
     private var progress: ProgressDialog? = null
     private var isLoading = false
-    private var isLastPage = false
 
     companion object {
         val TAG: String = CharacterListFragment::class.simpleName.toString()
@@ -162,14 +160,20 @@ class CharacterListFragment : Fragment() {
 
             override fun loadMoreItems() {
                 val state = App.INSTANCE.state
-                if (state != null && state.pageCount <= state.page) {
+                if (state != null && state.pageCount >= state.page) {
                     isLoading = true
                     characterAdapter.appLoading()
                     TasksProvider.provideTaskForLoadCharacters(state.page)
                 }
             }
 
-            override fun isLastPage() = isLastPage
+            override fun isLastPage(): Boolean {
+                val state = App.INSTANCE.state
+                if (state != null) {
+                    return state.pageCount <= state.page
+                }
+                return false
+            }
         })
     }
 

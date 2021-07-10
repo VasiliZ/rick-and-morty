@@ -6,6 +6,7 @@ import bolts.Continuation
 import bolts.Task
 import com.github.rtyvz.senla.tr.rick_and_morty.App
 import com.github.rtyvz.senla.tr.rick_and_morty.R
+import com.github.rtyvz.senla.tr.rick_and_morty.network.CharacterResponse
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.characters.ParticularCharacterFragment
 
 class GetParticularCharacterTask {
@@ -13,28 +14,32 @@ class GetParticularCharacterTask {
         val localBroadcastManager = LocalBroadcastManager.getInstance(App.INSTANCE)
         Task.callInBackground {
             App.api.getCharacter(id).execute().body()
-        }.continueWith(Continuation {
-            if (it.isFaulted) {
-                localBroadcastManager
-                    .sendBroadcastSync(Intent(ParticularCharacterFragment.BROADCAST_GET_CHARACTER_ERROR)
-                        .apply {
-                            putExtra(
-                                ParticularCharacterFragment.EXTRA_GET_CHARACTER_ERROR,
-                                App.INSTANCE.getString(R.string.task_fetching_error)
-                            )
-                        })
-                return@Continuation null
-            } else {
-                localBroadcastManager
-                    .sendBroadcastSync(Intent(ParticularCharacterFragment.BROADCAST_SINGLE_CHARACTER)
-                        .apply {
-                            putExtra(
-                                ParticularCharacterFragment.EXTRA_SINGLE_CHARACTER,
-                                it.result?.toCharacterEntity()
-                            )
-                        })
-                return@Continuation InsertCharacterIntoDbTask().insertCharacter(it.result?.toCharacterEntity())
-            }
-        }, Task.UI_THREAD_EXECUTOR)
+        }.continueWith(Continuation<CharacterResponse?, CharacterResponse> {
+            InsertCharacterIntoDbTask().insertCharacter(it.result?.toCharacterEntity())
+            return@Continuation it.result
+        }, Task.BACKGROUND_EXECUTOR)
+            .continueWith(Continuation {
+                if (it.isFaulted) {
+                    localBroadcastManager
+                        .sendBroadcastSync(Intent(ParticularCharacterFragment.BROADCAST_GET_CHARACTER_ERROR)
+                            .apply {
+                                putExtra(
+                                    ParticularCharacterFragment.EXTRA_GET_CHARACTER_ERROR,
+                                    App.INSTANCE.getString(R.string.task_fetching_error)
+                                )
+                            })
+                    return@Continuation
+                } else {
+                    localBroadcastManager
+                        .sendBroadcastSync(Intent(ParticularCharacterFragment.BROADCAST_SINGLE_CHARACTER)
+                            .apply {
+                                putExtra(
+                                    ParticularCharacterFragment.EXTRA_SINGLE_CHARACTER,
+                                    it.result?.toCharacterEntity()
+                                )
+                            })
+                    return@Continuation
+                }
+            }, Task.UI_THREAD_EXECUTOR)
     }
 }
