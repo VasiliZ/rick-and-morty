@@ -64,13 +64,28 @@ class ParticularCharacterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        prepareToLoadCharacter(characterId, view)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        registerCharacterReceiver()
+        registerCharacterErrorReceiver()
+    }
+
+    private fun prepareToLoadCharacter(characterId: Long?, view: View?) {
         localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
+
         findViews(view)
         initCharacterReceiver()
         initCharacterErrorReceiver()
-        progress.isVisible = true
-        groupView.isVisible = false
-        val characterEntity = TasksProvider.getCharacter(characterId)
+
+        if (characterId != null) {
+            progress.isVisible = true
+            groupView.isVisible = false
+            TasksProvider.getCharacter(characterId)
+        }
     }
 
     private fun initCharacterErrorReceiver() {
@@ -82,13 +97,6 @@ class ParticularCharacterFragment : Fragment() {
                 error.text = intent?.getStringExtra(EXTRA_GET_CHARACTER_ERROR)
             }
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        registerCharacterReceiver()
-        registerCharacterErrorReceiver()
     }
 
     private fun registerCharacterErrorReceiver() {
@@ -159,17 +167,19 @@ class ParticularCharacterFragment : Fragment() {
     private fun formatString(value: String?, resourceId: Int) =
         String.format(getString(resourceId), value)
 
-    private fun findViews(view: View) {
-        image = view.findViewById(R.id.characterImage)
-        nameTextView = view.findViewById(R.id.characterName)
-        genderTextView = view.findViewById(R.id.genderTextView)
-        statusImageView = view.findViewById(R.id.statusImageView)
-        statusTextView = view.findViewById(R.id.statusTextView)
-        locationTextView = view.findViewById(R.id.locationTextView)
-        typeTextView = view.findViewById(R.id.characterTypeTextView)
-        groupView = view.findViewById(R.id.viewsGroup)
-        progress = view.findViewById(R.id.progress)
-        error = view.findViewById(R.id.errorTextView)
+    private fun findViews(view: View?) {
+        if (view != null) {
+            image = view.findViewById(R.id.characterImage)
+            nameTextView = view.findViewById(R.id.characterName)
+            genderTextView = view.findViewById(R.id.genderTextView)
+            statusImageView = view.findViewById(R.id.statusImageView)
+            statusTextView = view.findViewById(R.id.statusTextView)
+            locationTextView = view.findViewById(R.id.locationTextView)
+            typeTextView = view.findViewById(R.id.characterTypeTextView)
+            groupView = view.findViewById(R.id.viewsGroup)
+            progress = view.findViewById(R.id.progress)
+            error = view.findViewById(R.id.errorTextView)
+        }
     }
 
     override fun onPause() {
@@ -177,5 +187,9 @@ class ParticularCharacterFragment : Fragment() {
         localBroadcastManager.unregisterReceiver(characterErrorReceiver)
 
         super.onPause()
+    }
+
+    fun loadCharacterById(id: Long?) {
+        prepareToLoadCharacter(id, view)
     }
 }
