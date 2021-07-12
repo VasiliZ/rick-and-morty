@@ -1,6 +1,6 @@
 package com.github.rtyvz.senla.tr.rick_and_morty.network
 
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
+import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.google.gson.annotations.SerializedName
 
 data class CharacterResponse(

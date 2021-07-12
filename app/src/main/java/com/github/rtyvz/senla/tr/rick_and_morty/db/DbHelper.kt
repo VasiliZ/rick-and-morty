@@ -3,7 +3,7 @@ package com.github.rtyvz.senla.tr.rick_and_morty.db
 import com.github.rtyvz.senla.tr.rick_and_morty.db.helpers.InsertValueHelper
 import com.github.rtyvz.senla.tr.rick_and_morty.db.helpers.SelectDataHelper
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.DBProvider
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
+import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import java.util.*
 
 class DbHelper {
@@ -34,7 +34,7 @@ class DbHelper {
         }
     }
 
-    fun deleteOldCharacters() {
+    fun deleteCharactersLoadedTheDayBefore() {
         val sql =
             "Delete from character where timestamp <= date('$CURRENT_TIME', '$PERIOD_FOR_DELETE_1_DAY')"
         DBProvider.provideDb().execSQL(sql)

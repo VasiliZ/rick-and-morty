@@ -1,4 +1,4 @@
-package com.github.rtyvz.senla.tr.rick_and_morty.ui.characters
+package com.github.rtyvz.senla.tr.rick_and_morty.ui.particularCharacter
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -16,8 +16,8 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bumptech.glide.Glide
 import com.github.rtyvz.senla.tr.rick_and_morty.R
+import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.TasksProvider
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 
@@ -35,7 +35,7 @@ class ParticularCharacterFragment : Fragment() {
     private lateinit var groupView: Group
     private lateinit var errorTextView: MaterialTextView
     private lateinit var localBroadcastManager: LocalBroadcastManager
-    private var characterId: Long = 0L
+    private var localCharacterId: Long = 0L
 
     companion object {
         private const val EXTRA_CHARACTER_ID = "CHARACTER_ID"
@@ -49,8 +49,9 @@ class ParticularCharacterFragment : Fragment() {
         fun newInstance(characterId: Long?) =
             ParticularCharacterFragment().apply {
                 if (characterId != null) {
-                    this.characterId = characterId
-                    arguments?.putLong(EXTRA_CHARACTER_ID, characterId)
+                    arguments = Bundle().apply {
+                        putLong(EXTRA_CHARACTER_ID, characterId)
+                    }
                 }
             }
     }
@@ -64,7 +65,10 @@ class ParticularCharacterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        prepareToLoadCharacter(characterId, view)
+        prepareToLoadCharacter(
+            arguments
+                ?.getLong(EXTRA_CHARACTER_ID, 0L) ?: 0L, view
+        )
     }
 
     override fun onResume() {
@@ -86,7 +90,7 @@ class ParticularCharacterFragment : Fragment() {
             groupView.isVisible = false
             TasksProvider.getCharacter(characterId)
         } else {
-            displayError(getString(R.string.particulat_character_fragment_data_is_empty))
+            displayError(getString(R.string.particular_character_fragment_data_is_empty))
         }
     }
 
@@ -126,11 +130,11 @@ class ParticularCharacterFragment : Fragment() {
     private fun initCharacterReceiver() {
         characterReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
+                displayData()
                 if (intent != null) {
-                    displayData()
                     setData(intent.getParcelableExtra(EXTRA_SINGLE_CHARACTER))
                 } else {
-                    displayError(getString(R.string.particulat_character_fragment_data_is_empty))
+                    displayError(getString(R.string.particular_character_fragment_data_is_empty))
                 }
             }
         }

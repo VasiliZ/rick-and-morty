@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.github.rtyvz.senla.tr.rick_and_morty.R
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
+import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 

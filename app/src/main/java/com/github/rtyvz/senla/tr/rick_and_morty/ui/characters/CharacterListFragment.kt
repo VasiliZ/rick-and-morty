@@ -21,7 +21,7 @@ import com.github.rtyvz.senla.tr.rick_and_morty.State
 import com.github.rtyvz.senla.tr.rick_and_morty.common.PaginationScrollListener
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.TasksProvider
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.dialog.ErrorDialogFragment
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
+import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.google.android.material.textview.MaterialTextView
 import java.util.Collections.emptyList
 
@@ -34,7 +34,7 @@ class CharacterListFragment : Fragment() {
     private lateinit var characterLoadingErrorReceiver: BroadcastReceiver
     private val characterAdapter by lazy {
         CharacterAdapter {
-            (activity as OpenParticularCharacterContract).openDisplayWithCharacter(it)
+            (activity as ClickOnCharacterContract).clickOnCharacter(it)
         }
     }
     private var progress: ProgressDialog? = null
@@ -76,7 +76,7 @@ class CharacterListFragment : Fragment() {
             when {
                 !state.isCharacterTaskRunning && state.data.isEmpty() -> {
                     progress?.show()
-                    TasksProvider.provideTaskForLoadCharacters(state.page)
+                    TasksProvider.provideTaskForLoadCharacters(state.currentPage)
                 }
 
                 state.isCharacterTaskRunning -> progress?.show()
@@ -87,7 +87,7 @@ class CharacterListFragment : Fragment() {
             }
 
             swipeToRefresh.setOnRefreshListener {
-                TasksProvider.provideTaskForLoadCharacters(state.page)
+                TasksProvider.provideTaskForLoadCharacters(state.currentPage)
             }
         }
 
@@ -135,11 +135,11 @@ class CharacterListFragment : Fragment() {
                         intent?.getParcelableArrayListExtra<CharacterEntity>(EXTRA_CHARACTER_LIST)
                             ?: emptyList()
 
-                    if (state.page > 1) {
+                    if (state.currentPage > 1) {
                         characterAdapter.removeLoading()
                     }
 
-                    state.page++
+                    state.currentPage++
                     App.INSTANCE.state?.data?.addAll(data)
                     characterAdapter.setData(data)
                     displayData()
@@ -155,7 +155,7 @@ class CharacterListFragment : Fragment() {
                 val state = App.INSTANCE.state
 
                 if (state != null) {
-                    if (state.page > 1) {
+                    if (state.currentPage > 1) {
                         isLoading = false
                         isErrorLoad = true
                         characterAdapter.removeLoading()
@@ -187,7 +187,7 @@ class CharacterListFragment : Fragment() {
     private fun startLoading(state: State) {
         isLoading = true
         characterAdapter.appLoading()
-        TasksProvider.provideTaskForLoadCharacters(state.page)
+        TasksProvider.provideTaskForLoadCharacters(state.currentPage)
     }
 
     private fun initRecycler(view: View) {
@@ -200,7 +200,7 @@ class CharacterListFragment : Fragment() {
 
             override fun loadMoreItems() {
                 val state = App.INSTANCE.state
-                if (state != null && state.pageCount >= state.page && !isErrorLoad) {
+                if (state != null && state.pageCount >= state.currentPage && !isErrorLoad) {
                     startLoading(state)
                 }
             }
@@ -209,7 +209,7 @@ class CharacterListFragment : Fragment() {
                 val state = App.INSTANCE.state
 
                 if (state != null) {
-                    return state.pageCount <= state.page
+                    return state.pageCount <= state.currentPage
                 }
 
                 return false
@@ -233,6 +233,6 @@ class CharacterListFragment : Fragment() {
     }
 }
 
-interface OpenParticularCharacterContract {
-    fun openDisplayWithCharacter(id: Long)
+interface ClickOnCharacterContract {
+    fun clickOnCharacter(id: Long)
 }

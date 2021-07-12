@@ -7,7 +7,7 @@ import bolts.Task
 import com.github.rtyvz.senla.tr.rick_and_morty.App
 import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.network.CharacterResponse
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.characters.ParticularCharacterFragment
+import com.github.rtyvz.senla.tr.rick_and_morty.ui.particularCharacter.ParticularCharacterFragment
 
 class GetParticularCharacterTask {
     fun getCharacter(id: Long) {

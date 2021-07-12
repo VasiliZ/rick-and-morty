@@ -1,7 +1,6 @@
 package com.github.rtyvz.senla.tr.rick_and_morty.db.helpers
 
 import android.database.sqlite.SQLiteDatabase
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
 
 class InsertValueHelper {
     private val listWithPartsOfQuery = mutableListOf<String>()

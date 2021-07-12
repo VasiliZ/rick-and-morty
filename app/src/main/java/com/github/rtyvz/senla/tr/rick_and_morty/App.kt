@@ -12,11 +12,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 class App : Application() {
     var state: State? = null
     lateinit var db: SQLiteDatabase
+    private lateinit var okHttpClient: OkHttpClient
 
     companion object {
         lateinit var INSTANCE: App
         lateinit var api: CharactersApi
-        private lateinit var okHttpClient: OkHttpClient
         private const val BASE_URL = "https://rickandmortyapi.com/api/"
     }
 
@@ -25,7 +25,7 @@ class App : Application() {
 
         INSTANCE = this
         db = AppDb(this).writableDatabase
-        DbHelper().deleteOldCharacters()
+        DbHelper().deleteCharactersLoadedTheDayBefore()
         okHttpClient = OkHttpClient.Builder().build()
         api = provideApi()
     }

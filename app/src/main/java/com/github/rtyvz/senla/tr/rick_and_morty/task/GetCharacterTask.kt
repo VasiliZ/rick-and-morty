@@ -6,8 +6,8 @@ import bolts.Continuation
 import bolts.Task
 import com.github.rtyvz.senla.tr.rick_and_morty.App
 import com.github.rtyvz.senla.tr.rick_and_morty.db.DbHelper
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.characters.ParticularCharacterFragment
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.entity.CharacterEntity
+import com.github.rtyvz.senla.tr.rick_and_morty.ui.particularCharacter.ParticularCharacterFragment
+import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 
 class GetCharacterTask {
     fun getCharacter(characterId: Long) {

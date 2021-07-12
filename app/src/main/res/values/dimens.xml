@@ -13,7 +13,7 @@
     <dimen name="round_small_image_size">20dp</dimen>
 
     <!--text size-->
-    <dimen name="body_text_size">16dp</dimen>
+    <dimen name="body_text_size">16sp</dimen>
 
     <!--radius-->
     <dimen name="card_corner_radius">12dp</dimen>

@@ -9,10 +9,10 @@ import com.github.rtyvz.senla.tr.rick_and_morty.App
 import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.State
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.characters.CharacterListFragment
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.characters.OpenParticularCharacterContract
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.characters.ParticularCharacterFragment
+import com.github.rtyvz.senla.tr.rick_and_morty.ui.characters.ClickOnCharacterContract
+import com.github.rtyvz.senla.tr.rick_and_morty.ui.particularCharacter.ParticularCharacterFragment
 
-class CharactersActivity : AppCompatActivity(), OpenParticularCharacterContract {
+class CharactersActivity : AppCompatActivity(), ClickOnCharacterContract {
     private var dataContainer: FragmentContainerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +42,7 @@ class CharactersActivity : AppCompatActivity(), OpenParticularCharacterContract 
     private fun createFragment(fragmentId: Int, fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(fragmentId, fragment)
-        transaction.addToBackStack(fragment.tag)
+        transaction.addToBackStack(null)
         transaction.commit()
     }
 
@@ -66,11 +66,14 @@ class CharactersActivity : AppCompatActivity(), OpenParticularCharacterContract 
         }
     }
 
-    override fun openDisplayWithCharacter(id: Long) {
+    override fun clickOnCharacter(id: Long) {
         if (isDataContainerAvailable()) {
             val fragment = supportFragmentManager.findFragmentById(R.id.characterDataContainer)
             if (fragment == null) {
-                createFragment(R.id.characterDataContainer, ParticularCharacterFragment())
+                createFragment(
+                    R.id.characterDataContainer,
+                    ParticularCharacterFragment.newInstance(0L)
+                )
             } else {
                 (fragment as ParticularCharacterFragment).loadCharacterById(id)
             }

@@ -1,4 +1,4 @@
-package com.github.rtyvz.senla.tr.rick_and_morty.ui.entity
+package com.github.rtyvz.senla.tr.rick_and_morty.entity
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

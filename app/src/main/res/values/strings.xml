@@ -2,12 +2,18 @@
     <string name="app_name">rick-and-morty</string>
 
     <!--Character fragment-->
-    <string name="character_list_fragment_wait_label">Wait please</string>
+    <string name="character_list_fragment_wait_label">Пожалуйста ожидайте</string>
     <string name="character_adapter_location">Location: %s</string>
-    <string name="character_adapter_type">Type: %s</string>
-    <string name="particulat_character_fragment_data_is_empty">Нет данных для отображения</string>
+    <string name="character_adapter_type">Тип: %s</string>
+
+    <!--particular fragment-->
+    <string name="particular_character_fragment_data_is_empty">Нет данных для отображения</string>
+
+    <!--task-->
     <string name="task_fetching_error">Не удалось загрузить данные</string>
     <string name="dialog_retry_load">Не удалось загрузить данные, попробовать еще раз?</string>
+
+    <!--dialog-->
     <string name="dialog_ok_label">Да</string>
     <string name="dialog_no_label">Нет</string>
 </resources>
