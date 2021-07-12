@@ -33,7 +33,7 @@ class ParticularCharacterFragment : Fragment() {
     private lateinit var characterErrorReceiver: BroadcastReceiver
     private lateinit var progress: ProgressBar
     private lateinit var groupView: Group
-    private lateinit var error: MaterialTextView
+    private lateinit var errorTextView: MaterialTextView
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private var characterId: Long = 0L
 
@@ -74,29 +74,41 @@ class ParticularCharacterFragment : Fragment() {
         registerCharacterErrorReceiver()
     }
 
-    private fun prepareToLoadCharacter(characterId: Long?, view: View?) {
+    private fun prepareToLoadCharacter(characterId: Long, view: View?) {
         localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
 
         findViews(view)
         initCharacterReceiver()
         initCharacterErrorReceiver()
 
-        if (characterId != null) {
+        if (characterId != 0L) {
             progress.isVisible = true
             groupView.isVisible = false
             TasksProvider.getCharacter(characterId)
+        } else {
+            displayError(getString(R.string.particulat_character_fragment_data_is_empty))
         }
     }
 
     private fun initCharacterErrorReceiver() {
         characterErrorReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                progress.isVisible = false
-                groupView.isVisible = false
-                error.isVisible = true
-                error.text = intent?.getStringExtra(EXTRA_GET_CHARACTER_ERROR)
+                displayError(intent?.getStringExtra(EXTRA_GET_CHARACTER_ERROR))
             }
         }
+    }
+
+    private fun displayError(error: String?) {
+        progress.isVisible = false
+        groupView.isVisible = false
+        errorTextView.isVisible = true
+        errorTextView.text = error
+    }
+
+    private fun displayData() {
+        progress.isVisible = false
+        groupView.isVisible = true
+        errorTextView.isVisible = false
     }
 
     private fun registerCharacterErrorReceiver() {
@@ -115,14 +127,10 @@ class ParticularCharacterFragment : Fragment() {
         characterReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent != null) {
-                    progress.isVisible = false
-                    groupView.isVisible = true
+                    displayData()
                     setData(intent.getParcelableExtra(EXTRA_SINGLE_CHARACTER))
                 } else {
-                    progress.isVisible = false
-                    groupView.isVisible = false
-                    error.isVisible = true
-                    error.text = getString(R.string.particulat_character_fragment_data_is_empty)
+                    displayError(getString(R.string.particulat_character_fragment_data_is_empty))
                 }
             }
         }
@@ -178,7 +186,7 @@ class ParticularCharacterFragment : Fragment() {
             typeTextView = view.findViewById(R.id.characterTypeTextView)
             groupView = view.findViewById(R.id.viewsGroup)
             progress = view.findViewById(R.id.progress)
-            error = view.findViewById(R.id.errorTextView)
+            errorTextView = view.findViewById(R.id.errorTextView)
         }
     }
 
@@ -189,7 +197,7 @@ class ParticularCharacterFragment : Fragment() {
         super.onPause()
     }
 
-    fun loadCharacterById(id: Long?) {
+    fun loadCharacterById(id: Long) {
         prepareToLoadCharacter(id, view)
     }
 }

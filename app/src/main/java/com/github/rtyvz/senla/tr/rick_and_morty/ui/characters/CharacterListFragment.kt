@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github.rtyvz.senla.tr.rick_and_morty.App
 import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.State
@@ -27,6 +28,7 @@ import java.util.Collections.emptyList
 class CharacterListFragment : Fragment() {
     private lateinit var characterRecyclerView: RecyclerView
     private lateinit var errorTextView: MaterialTextView
+    private lateinit var swipeToRefresh: SwipeRefreshLayout
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private lateinit var characterListReceiver: BroadcastReceiver
     private lateinit var characterLoadingErrorReceiver: BroadcastReceiver
@@ -58,6 +60,7 @@ class CharacterListFragment : Fragment() {
 
         localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
         errorTextView = view.findViewById(R.id.errorTextView)
+        swipeToRefresh = view.findViewById(R.id.refreshLayout)
 
         initRecycler(view)
         initProgress()
@@ -81,6 +84,10 @@ class CharacterListFragment : Fragment() {
                     progress?.dismiss()
                     characterAdapter.setData(state.data)
                 }
+            }
+
+            swipeToRefresh.setOnRefreshListener {
+                TasksProvider.provideTaskForLoadCharacters(state.page)
             }
         }
 
@@ -119,6 +126,7 @@ class CharacterListFragment : Fragment() {
         characterListReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val state = App.INSTANCE.state
+                swipeToRefresh.isRefreshing = false
 
                 if (state != null) {
                     isLoading = false
@@ -134,6 +142,7 @@ class CharacterListFragment : Fragment() {
                     state.page++
                     App.INSTANCE.state?.data?.addAll(data)
                     characterAdapter.setData(data)
+                    displayData()
                 }
             }
         }
@@ -142,7 +151,9 @@ class CharacterListFragment : Fragment() {
     private fun initLoadingErrorReceiver() {
         characterLoadingErrorReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
+                swipeToRefresh.isRefreshing = false
                 val state = App.INSTANCE.state
+
                 if (state != null) {
                     if (state.page > 1) {
                         isLoading = false
@@ -153,8 +164,7 @@ class CharacterListFragment : Fragment() {
                             startLoading(state)
                         }.show(parentFragmentManager, ErrorDialogFragment.TAG)
                     } else {
-                        errorTextView.isVisible = true
-                        characterRecyclerView.isVisible = false
+                        displayError()
                         errorTextView.text = intent?.getStringExtra(EXTRA_CHARACTER_LOADING_ERROR)
                         isLoading = false
                         progress?.dismiss()
@@ -162,6 +172,16 @@ class CharacterListFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun displayError() {
+        errorTextView.isVisible = true
+        characterRecyclerView.isVisible = false
+    }
+
+    private fun displayData() {
+        errorTextView.isVisible = false
+        characterRecyclerView.isVisible = true
     }
 
     private fun startLoading(state: State) {
@@ -187,9 +207,11 @@ class CharacterListFragment : Fragment() {
 
             override fun isLastPage(): Boolean {
                 val state = App.INSTANCE.state
+
                 if (state != null) {
                     return state.pageCount <= state.page
                 }
+
                 return false
             }
         })
@@ -212,5 +234,5 @@ class CharacterListFragment : Fragment() {
 }
 
 interface OpenParticularCharacterContract {
-    fun openDisplayWithCharacter(id: Long?)
+    fun openDisplayWithCharacter(id: Long)
 }

@@ -29,7 +29,6 @@ class CharactersActivity : AppCompatActivity(), OpenParticularCharacterContract 
         createFragmentFromOrientation()
 
         actionBar?.setDisplayHomeAsUpEnabled(true)
-        actionBar?.setHomeButtonEnabled(true)
     }
 
     private fun createFragmentFromOrientation() {
@@ -67,7 +66,7 @@ class CharactersActivity : AppCompatActivity(), OpenParticularCharacterContract 
         }
     }
 
-    override fun openDisplayWithCharacter(id: Long?) {
+    override fun openDisplayWithCharacter(id: Long) {
         if (isDataContainerAvailable()) {
             val fragment = supportFragmentManager.findFragmentById(R.id.characterDataContainer)
             if (fragment == null) {

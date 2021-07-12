@@ -11,7 +11,7 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 
 class CharacterAdapter(
-    private val click: (Long?) -> (Unit)
+    private val click: (Long) -> (Unit)
 ) :
     RecyclerView.Adapter<CharacterAdapter.BaseViewHolder>() {
     private val characterList = mutableListOf<CharacterEntity>()
@@ -30,7 +30,7 @@ class CharacterAdapter(
                         .inflate(R.layout.character_item, parent, false)
                 ).apply {
                     itemView.setOnClickListener {
-                        click(getItem(adapterPosition).id)
+                        click(getItem(adapterPosition).id ?: 0L)
                     }
                 }
             }
