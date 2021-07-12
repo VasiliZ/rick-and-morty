@@ -32,16 +32,24 @@ class CharactersActivity : AppCompatActivity(), ClickOnCharacterContract {
     }
 
     private fun createFragmentFromOrientation() {
-        createFragment(R.id.characterListContainer, CharacterListFragment())
+        createFragment(
+            R.id.characterListContainer,
+            CharacterListFragment(),
+            CharacterListFragment.TAG
+        )
 
         if (isDataContainerAvailable()) {
-            createFragment(R.id.characterDataContainer, ParticularCharacterFragment())
+            createFragment(
+                R.id.characterDataContainer,
+                ParticularCharacterFragment.newInstance(0L),
+                ParticularCharacterFragment.TAG
+            )
         }
     }
 
-    private fun createFragment(fragmentId: Int, fragment: Fragment) {
+    private fun createFragment(containerViewId: Int, fragment: Fragment, tag: String) {
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.replace(fragmentId, fragment)
+        transaction.replace(containerViewId, fragment, tag)
         transaction.addToBackStack(null)
         transaction.commit()
     }
@@ -68,17 +76,16 @@ class CharactersActivity : AppCompatActivity(), ClickOnCharacterContract {
 
     override fun clickOnCharacter(id: Long) {
         if (isDataContainerAvailable()) {
-            val fragment = supportFragmentManager.findFragmentById(R.id.characterDataContainer)
-            if (fragment == null) {
-                createFragment(
-                    R.id.characterDataContainer,
-                    ParticularCharacterFragment.newInstance(0L)
-                )
-            } else {
-                (fragment as ParticularCharacterFragment).loadCharacterById(id)
+            val fragment = supportFragmentManager.findFragmentByTag(ParticularCharacterFragment.TAG)
+            if (fragment is ParticularCharacterFragment) {
+                fragment.loadCharacterById(id)
             }
         } else {
-            createFragment(R.id.characterListContainer, ParticularCharacterFragment.newInstance(id))
+            createFragment(
+                R.id.characterListContainer,
+                ParticularCharacterFragment.newInstance(id),
+                ParticularCharacterFragment.TAG
+            )
         }
     }
 }

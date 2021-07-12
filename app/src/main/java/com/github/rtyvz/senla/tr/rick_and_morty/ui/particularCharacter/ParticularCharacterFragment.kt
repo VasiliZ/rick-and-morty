@@ -35,7 +35,6 @@ class ParticularCharacterFragment : Fragment() {
     private lateinit var groupView: Group
     private lateinit var errorTextView: MaterialTextView
     private lateinit var localBroadcastManager: LocalBroadcastManager
-    private var localCharacterId: Long = 0L
 
     companion object {
         private const val EXTRA_CHARACTER_ID = "CHARACTER_ID"
@@ -45,6 +44,7 @@ class ParticularCharacterFragment : Fragment() {
         const val BROADCAST_GET_CHARACTER_ERROR = "local:BROADCAST_GET_CHARACTER_ERROR"
         const val EXTRA_SINGLE_CHARACTER = "SINGLE_CHARACTER"
         const val EXTRA_GET_CHARACTER_ERROR = "GET_CHARACTER_ERROR"
+        val TAG: String = ParticularCharacterFragment::class.java.simpleName
 
         fun newInstance(characterId: Long?) =
             ParticularCharacterFragment().apply {
@@ -65,9 +65,14 @@ class ParticularCharacterFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
+
+        findViews(view)
+        initCharacterReceiver()
+        initCharacterErrorReceiver()
         prepareToLoadCharacter(
             arguments
-                ?.getLong(EXTRA_CHARACTER_ID, 0L) ?: 0L, view
+                ?.getLong(EXTRA_CHARACTER_ID, 0L) ?: 0L
         )
     }
 
@@ -78,12 +83,7 @@ class ParticularCharacterFragment : Fragment() {
         registerCharacterErrorReceiver()
     }
 
-    private fun prepareToLoadCharacter(characterId: Long, view: View?) {
-        localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
-
-        findViews(view)
-        initCharacterReceiver()
-        initCharacterErrorReceiver()
+    private fun prepareToLoadCharacter(characterId: Long) {
 
         if (characterId != 0L) {
             progress.isVisible = true
@@ -202,6 +202,6 @@ class ParticularCharacterFragment : Fragment() {
     }
 
     fun loadCharacterById(id: Long) {
-        prepareToLoadCharacter(id, view)
+        prepareToLoadCharacter(id)
     }
 }

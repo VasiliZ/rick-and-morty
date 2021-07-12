@@ -19,9 +19,9 @@ import com.github.rtyvz.senla.tr.rick_and_morty.App
 import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.State
 import com.github.rtyvz.senla.tr.rick_and_morty.common.PaginationScrollListener
+import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.TasksProvider
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.dialog.ErrorDialogFragment
-import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.google.android.material.textview.MaterialTextView
 import java.util.Collections.emptyList
 
@@ -32,6 +32,7 @@ class CharacterListFragment : Fragment() {
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private lateinit var characterListReceiver: BroadcastReceiver
     private lateinit var characterLoadingErrorReceiver: BroadcastReceiver
+    private var currentView: View? = null
     private val characterAdapter by lazy {
         CharacterAdapter {
             (activity as ClickOnCharacterContract).clickOnCharacter(it)
@@ -46,30 +47,24 @@ class CharacterListFragment : Fragment() {
         const val BROADCAST_CHARACTER_LOADING_ERROR = "local:BROADCAST_CHARACTER_LOADING_ERROR"
         const val EXTRA_CHARACTER_LIST = "CHARACTER_LIST"
         const val EXTRA_CHARACTER_LOADING_ERROR = "CHARACTER_LOADING_ERROR"
+        val TAG: String = CharacterListFragment::class.java.simpleName
     }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.character_list_fragment, container, false)
+    ): View {
+        val view = inflater.inflate(R.layout.character_list_fragment, container, false)
+        currentView = view
+        return view
+    }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
-        errorTextView = view.findViewById(R.id.errorTextView)
-        swipeToRefresh = view.findViewById(R.id.refreshLayout)
-
-        initRecycler(view)
-        initProgress()
-        initCharacterListReceiver()
-        initLoadingErrorReceiver()
-    }
-
-    override fun onResume() {
-        super.onResume()
+        initFragmentState(view)
 
         val state = App.INSTANCE.state
         if (state != null) {
@@ -94,8 +89,29 @@ class CharacterListFragment : Fragment() {
         characterRecyclerView
             .layoutManager?.onRestoreInstanceState(App.INSTANCE.state?.characterRecyclerState)
 
+        initCharacterListReceiver()
+        initLoadingErrorReceiver()
+    }
+
+    private fun initFragmentState(view: View?) {
+        localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
+        initRecycler(view)
+        findViews(view)
+        initProgress()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
         registerCharacterReceiver()
         registerLoadingErrorReceiver()
+    }
+
+    private fun findViews(view: View?) {
+        if (view != null) {
+            errorTextView = view.findViewById(R.id.errorTextView)
+            swipeToRefresh = view.findViewById(R.id.refreshLayout)
+        }
     }
 
     private fun initProgress() {
@@ -190,31 +206,33 @@ class CharacterListFragment : Fragment() {
         TasksProvider.provideTaskForLoadCharacters(state.currentPage)
     }
 
-    private fun initRecycler(view: View) {
-        characterRecyclerView = view.findViewById(R.id.characterList)
-        characterRecyclerView.adapter = characterAdapter
-        characterRecyclerView.addOnScrollListener(object : PaginationScrollListener(
-            characterRecyclerView.layoutManager as LinearLayoutManager
-        ) {
-            override fun isLoading() = isLoading
+    private fun initRecycler(view: View?) {
+        if (view != null) {
+            characterRecyclerView = view.findViewById(R.id.characterList)
+            characterRecyclerView.adapter = characterAdapter
+            characterRecyclerView.addOnScrollListener(object : PaginationScrollListener(
+                characterRecyclerView.layoutManager as LinearLayoutManager
+            ) {
+                override fun isLoading() = isLoading
 
-            override fun loadMoreItems() {
-                val state = App.INSTANCE.state
-                if (state != null && state.pageCount >= state.currentPage && !isErrorLoad) {
-                    startLoading(state)
-                }
-            }
-
-            override fun isLastPage(): Boolean {
-                val state = App.INSTANCE.state
-
-                if (state != null) {
-                    return state.pageCount <= state.currentPage
+                override fun loadMoreItems() {
+                    val state = App.INSTANCE.state
+                    if (state != null && state.pageCount >= state.currentPage && !isErrorLoad) {
+                        startLoading(state)
+                    }
                 }
 
-                return false
-            }
-        })
+                override fun isLastPage(): Boolean {
+                    val state = App.INSTANCE.state
+
+                    if (state != null) {
+                        return state.pageCount <= state.currentPage
+                    }
+
+                    return false
+                }
+            })
+        }
     }
 
     override fun onPause() {
