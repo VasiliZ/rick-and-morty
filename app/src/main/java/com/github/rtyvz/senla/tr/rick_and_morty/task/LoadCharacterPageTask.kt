@@ -15,7 +15,6 @@ class LoadCharacterPageTask {
 
         Task.callInBackground {
             App.INSTANCE.state?.isCharacterTaskRunning = true
-            Thread.sleep(5000)
             App.api.getCharacters(pageId).execute().body()
         }.continueWith(Continuation<Response?, Nothing> {
                 if (it.isFaulted) {
