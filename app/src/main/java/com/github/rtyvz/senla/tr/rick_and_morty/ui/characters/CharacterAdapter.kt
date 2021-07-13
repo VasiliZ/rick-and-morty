@@ -61,7 +61,7 @@ class CharacterAdapter(
 
     override fun getItemCount() = characterList.size
 
-    fun appLoading() {
+    fun addLoading() {
         isLoaderVisible = true
         characterList.add(CharacterEntity())
         notifyItemInserted(characterList.size - 1)

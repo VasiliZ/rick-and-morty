@@ -69,7 +69,7 @@ class CharacterListFragment : Fragment() {
         val state = App.INSTANCE.state
         if (state != null) {
             when {
-                !state.isCharacterTaskRunning && state.data.isEmpty() -> {
+                !state.isCharacterTaskRunning && state.characterEntityList.isEmpty() -> {
                     progress?.show()
                     TasksProvider.provideTaskForLoadCharacters(state.currentPage)
                 }
@@ -77,7 +77,7 @@ class CharacterListFragment : Fragment() {
                 state.isCharacterTaskRunning -> progress?.show()
                 else -> {
                     progress?.dismiss()
-                    characterAdapter.setData(state.data)
+                    characterAdapter.setData(state.characterEntityList)
                 }
             }
 
@@ -156,7 +156,7 @@ class CharacterListFragment : Fragment() {
                     }
 
                     state.currentPage++
-                    App.INSTANCE.state?.data?.addAll(data)
+                    App.INSTANCE.state?.characterEntityList?.addAll(data)
                     characterAdapter.setData(data)
                     displayData()
                 }
@@ -202,7 +202,7 @@ class CharacterListFragment : Fragment() {
 
     private fun startLoading(state: State) {
         isLoading = true
-        characterAdapter.appLoading()
+        characterAdapter.addLoading()
         TasksProvider.provideTaskForLoadCharacters(state.currentPage)
     }
 
@@ -244,10 +244,10 @@ class CharacterListFragment : Fragment() {
         super.onPause()
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         progress?.dismiss()
 
-        super.onDestroy()
+        super.onDestroyView()
     }
 }
 
