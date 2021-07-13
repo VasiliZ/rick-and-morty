@@ -21,7 +21,7 @@ import com.github.rtyvz.senla.tr.rick_and_morty.State
 import com.github.rtyvz.senla.tr.rick_and_morty.common.PaginationScrollListener
 import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.TasksProvider
-import com.github.rtyvz.senla.tr.rick_and_morty.ui.dialog.ErrorDialogFragment
+import com.github.rtyvz.senla.tr.rick_and_morty.ui.dialog.ErrorLoadListCharactersDialogFragment
 import com.google.android.material.textview.MaterialTextView
 import java.util.Collections.emptyList
 
@@ -32,22 +32,22 @@ class CharacterListFragment : Fragment() {
     private lateinit var localBroadcastManager: LocalBroadcastManager
     private lateinit var characterListReceiver: BroadcastReceiver
     private lateinit var characterLoadingErrorReceiver: BroadcastReceiver
-    private var currentView: View? = null
     private val characterAdapter by lazy {
         CharacterAdapter {
-            (activity as ClickOnCharacterContract).clickOnCharacter(it)
+            (activity as ActivityContract).clickOnCharacter(it)
         }
     }
     private var progress: ProgressDialog? = null
     private var isLoading = false
     private var isErrorLoad = false
+    private var state: State? = null
 
     companion object {
         const val BROADCAST_CHARACTER_LIST = "local:BROADCAST_CHARACTER_LIST"
         const val BROADCAST_CHARACTER_LOADING_ERROR = "local:BROADCAST_CHARACTER_LOADING_ERROR"
         const val EXTRA_CHARACTER_LIST = "CHARACTER_LIST"
         const val EXTRA_CHARACTER_LOADING_ERROR = "CHARACTER_LOADING_ERROR"
-        val TAG: String = CharacterListFragment::class.java.simpleName
+        val TAG = CharacterListFragment::class.java.simpleName.toString()
     }
 
     override fun onCreateView(
@@ -56,7 +56,7 @@ class CharacterListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.character_list_fragment, container, false)
-        currentView = view
+        initFragmentState(view)
         return view
     }
 
@@ -64,9 +64,8 @@ class CharacterListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initFragmentState(view)
-
         val state = App.INSTANCE.state
+        this.state = state
         if (state != null) {
             when {
                 !state.isCharacterTaskRunning && state.characterEntityList.isEmpty() -> {
@@ -171,28 +170,21 @@ class CharacterListFragment : Fragment() {
                 val state = App.INSTANCE.state
 
                 if (state != null) {
-                    if (state.currentPage > 1) {
-                        isLoading = false
-                        isErrorLoad = true
+                    isLoading = false
+                    isErrorLoad = true
+                    progress?.dismiss()
+
+                    if (state.characterEntityList.isNotEmpty()) {
                         characterAdapter.removeLoading()
-                        ErrorDialogFragment {
-                            isErrorLoad = false
-                            startLoading(state)
-                        }.show(parentFragmentManager, ErrorDialogFragment.TAG)
-                    } else {
-                        displayError()
-                        errorTextView.text = intent?.getStringExtra(EXTRA_CHARACTER_LOADING_ERROR)
-                        isLoading = false
-                        progress?.dismiss()
                     }
+
+                    ErrorLoadListCharactersDialogFragment().show(
+                        parentFragmentManager,
+                        ErrorLoadListCharactersDialogFragment.TAG
+                    )
                 }
             }
         }
-    }
-
-    private fun displayError() {
-        errorTextView.isVisible = true
-        characterRecyclerView.isVisible = false
     }
 
     private fun displayData() {
@@ -200,10 +192,14 @@ class CharacterListFragment : Fragment() {
         characterRecyclerView.isVisible = true
     }
 
-    private fun startLoading(state: State) {
+    private fun startLoading(state: State?) {
         isLoading = true
-        characterAdapter.addLoading()
-        TasksProvider.provideTaskForLoadCharacters(state.currentPage)
+
+        if (state?.characterEntityList?.isNotEmpty() == true) {
+            characterAdapter.addLoading()
+        }
+
+        TasksProvider.provideTaskForLoadCharacters(state?.currentPage ?: 0)
     }
 
     private fun initRecycler(view: View?) {
@@ -249,8 +245,24 @@ class CharacterListFragment : Fragment() {
 
         super.onDestroyView()
     }
+
+    fun positiveAction() {
+        isErrorLoad = false
+
+        if (state?.characterEntityList?.isEmpty() == true) {
+            progress?.show()
+        }
+        startLoading(state)
+    }
+
+    fun negativeAction() {
+        if (state?.characterEntityList?.isEmpty() == true) {
+            (activity as ActivityContract).closeActivity()
+        }
+    }
 }
 
-interface ClickOnCharacterContract {
+interface ActivityContract {
     fun clickOnCharacter(id: Long)
+    fun closeActivity()
 }

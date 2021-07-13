@@ -19,7 +19,7 @@ class GetParticularCharacterTask {
             return@Continuation it.result
         }, Task.BACKGROUND_EXECUTOR)
             .continueWith(Continuation {
-                if (it.isFaulted) {
+                if (it.isFaulted || it.result == null) {
                     localBroadcastManager
                         .sendBroadcastSync(Intent(ParticularCharacterFragment.BROADCAST_GET_CHARACTER_ERROR)
                             .apply {

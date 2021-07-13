@@ -48,8 +48,8 @@ class CharacterAdapter(
 
 
     override fun getItemViewType(position: Int): Int {
-        return if (isLoaderVisible) {
-            if (position == characterList.size - 1) LOADING_VIEW_TYPE else DATA_VIEW_TYPE
+        return if (isLoaderVisible && position == characterList.size - 1) {
+            LOADING_VIEW_TYPE
         } else {
             DATA_VIEW_TYPE
         }

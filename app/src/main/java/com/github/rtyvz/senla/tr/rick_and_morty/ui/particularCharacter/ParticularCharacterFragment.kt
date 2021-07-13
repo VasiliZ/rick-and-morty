@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide
 import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.TasksProvider
+import com.github.rtyvz.senla.tr.rick_and_morty.ui.dialog.ErrorLoadSingleCharacterDialogFragment
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 
@@ -60,14 +61,17 @@ class ParticularCharacterFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.particular_character_fragment, container, false)
+    ): View {
+        val view = inflater.inflate(R.layout.particular_character_fragment, container, false)
+        findViews(view)
+        return view
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
 
-        findViews(view)
         initCharacterReceiver()
         initCharacterErrorReceiver()
         prepareToLoadCharacter(
@@ -89,15 +93,17 @@ class ParticularCharacterFragment : Fragment() {
             progress.isVisible = true
             groupView.isVisible = false
             TasksProvider.getCharacter(characterId)
-        } else {
-            displayError(getString(R.string.particular_character_fragment_data_is_empty))
         }
     }
 
     private fun initCharacterErrorReceiver() {
         characterErrorReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                displayError(intent?.getStringExtra(EXTRA_GET_CHARACTER_ERROR))
+                progress.isVisible = false
+                ErrorLoadSingleCharacterDialogFragment().show(
+                    parentFragmentManager,
+                    ErrorLoadSingleCharacterDialogFragment.TAG
+                )
             }
         }
     }
@@ -204,4 +210,19 @@ class ParticularCharacterFragment : Fragment() {
     fun loadCharacterById(id: Long) {
         prepareToLoadCharacter(id)
     }
+
+    fun positiveAction() {
+        prepareToLoadCharacter(
+            arguments
+                ?.getLong(EXTRA_CHARACTER_ID, 0L) ?: 0L
+        )
+    }
+
+    fun negativeAction() {
+        (activity as HandleNegativeButtonDialogClick).popBackStack()
+    }
+}
+
+interface HandleNegativeButtonDialogClick {
+    fun popBackStack()
 }
