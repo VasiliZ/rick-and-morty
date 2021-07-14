@@ -104,6 +104,7 @@ class CharacterListFragment : Fragment() {
 
         val state = App.INSTANCE.state
         if (state != null && state.characterEntityList.isEmpty()) {
+            progress?.show()
             TasksProvider.provideTaskForLoadCharacters(state.currentPage)
         }
 
