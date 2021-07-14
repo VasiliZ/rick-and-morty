@@ -31,6 +31,12 @@ class ErrorLoadSingleCharacterDialogFragment : DialogFragment() {
                 handleClickListener?.handleNegativeActionErrorLoadSingleCharacterDialog()
             }.create()
     }
+
+    override fun onDetach() {
+        handleClickListener = null
+
+        super.onDetach()
+    }
 }
 
 interface HandleClickErrorLoadSingleCharacter {
