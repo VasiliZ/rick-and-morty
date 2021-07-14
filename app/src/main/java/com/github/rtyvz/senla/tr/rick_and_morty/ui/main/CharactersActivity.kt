@@ -49,7 +49,6 @@ class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegative
             addFragment()
         }
 
-
         if (isDataContainerAvailable()) {
             createFragment(
                 R.id.characterDataContainer,
@@ -97,6 +96,7 @@ class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegative
     override fun onBackPressed() {
         when (supportFragmentManager.backStackEntryCount) {
             1 -> {
+                App.INSTANCE.state = null
                 finish()
             }
             else -> {
