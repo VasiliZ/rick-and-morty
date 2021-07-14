@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">rick-and-morty</string>
+    <string name="app_name">Rick and Morty</string>
 
     <!--Character fragment-->
     <string name="character_list_fragment_wait_label">Wait please</string>
