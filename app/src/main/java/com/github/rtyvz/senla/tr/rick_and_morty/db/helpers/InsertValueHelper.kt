@@ -7,11 +7,7 @@ class InsertValueHelper {
 
     companion object {
         private const val INSERT_OPERATION = "insert into "
-        private const val OPEN_BRACKET = "("
-        private const val CLOSE_BRACKET = ")"
         private const val VALUES = "VALUES"
-        private const val SELECT_OPERATOR = " SELECT "
-        private const val FROM_OPERATOR = " FROM "
     }
 
     fun table(tableName: String) {
@@ -19,38 +15,9 @@ class InsertValueHelper {
         listWithPartsOfQuery.add(tableName)
     }
 
-    fun selectFields(selectFields: String) {
-        listWithPartsOfQuery.add(selectFields)
-    }
-
-    fun fields(fieldsName: String) {
-        listWithPartsOfQuery.add(OPEN_BRACKET)
-        listWithPartsOfQuery.add(fieldsName)
-        listWithPartsOfQuery.add(CLOSE_BRACKET)
-    }
-
     fun values(values: String) {
         listWithPartsOfQuery.add(VALUES)
         listWithPartsOfQuery.add(values)
-    }
-
-    fun select() {
-        listWithPartsOfQuery.add(SELECT_OPERATOR)
-    }
-
-    fun from(tableName: String) {
-        listWithPartsOfQuery.add(FROM_OPERATOR)
-        listWithPartsOfQuery.add(tableName)
-    }
-
-    fun insertFromSelect(db: SQLiteDatabase?) {
-        val insertSql =
-            listWithPartsOfQuery.joinToString(
-                separator = "",
-                prefix = "",
-                postfix = ""
-            )
-        db?.execSQL(insertSql)
     }
 
     fun insert(db: SQLiteDatabase?, listArgs: List<Any?>) {
