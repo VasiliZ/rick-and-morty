@@ -9,6 +9,7 @@
 
     <!--size-->
     <dimen name="photo_height_normal">350dp</dimen>
+    <dimen name="photo_size_land">200dp</dimen>
     <dimen name="photo_height_big">450dp</dimen>
     <dimen name="round_small_image_size">20dp</dimen>
 
