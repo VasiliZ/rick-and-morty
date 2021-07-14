@@ -8,5 +8,6 @@ data class State(
     val characterEntityList: MutableList<CharacterEntity> = mutableListOf(),
     var characterRecyclerState: Parcelable? = null,
     var currentPage: Int = 1,
-    var pageCount: Int = 0
+    var pageCount: Int = 0,
+    var lastOpenedCharacterId: Long = 0L
 )

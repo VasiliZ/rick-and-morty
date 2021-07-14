@@ -15,6 +15,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.bumptech.glide.Glide
+import com.github.rtyvz.senla.tr.rick_and_morty.App
 import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.TasksProvider
@@ -78,6 +79,7 @@ class ParticularCharacterFragment : Fragment() {
             arguments
                 ?.getLong(EXTRA_CHARACTER_ID, 0L) ?: 0L
         )
+        arguments = null
     }
 
     override fun onResume() {
@@ -88,7 +90,6 @@ class ParticularCharacterFragment : Fragment() {
     }
 
     private fun prepareToLoadCharacter(characterId: Long) {
-
         if (characterId != 0L) {
             progress.isVisible = true
             groupView.isVisible = false
@@ -138,7 +139,10 @@ class ParticularCharacterFragment : Fragment() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 displayData()
                 if (intent != null) {
-                    setData(intent.getParcelableExtra(EXTRA_SINGLE_CHARACTER))
+                    val character =
+                        intent.getParcelableExtra<CharacterEntity>(EXTRA_SINGLE_CHARACTER)
+                    App.INSTANCE.state?.lastOpenedCharacterId = character?.id ?: 0L
+                    setData(character)
                 } else {
                     displayError(getString(R.string.particular_character_fragment_data_is_empty))
                 }

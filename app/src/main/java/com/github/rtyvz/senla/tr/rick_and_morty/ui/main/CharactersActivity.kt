@@ -34,7 +34,7 @@ class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegative
         dataContainer = findViewById(R.id.characterDataContainer)
 
         val state = App.INSTANCE.state
-        createFragmentFromOrientation(state)
+        createFragmentsFromOrientation(state)
 
         if (state == null) {
             App.INSTANCE.state = State()
@@ -44,15 +44,30 @@ class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegative
         actionBar?.setHomeButtonEnabled(true)
     }
 
-    private fun createFragmentFromOrientation(state: State?) {
+    private fun createFragmentsFromOrientation(state: State?) {
         if (state == null) {
             addFragment()
         }
 
+
         if (isDataContainerAvailable()) {
             createFragment(
                 R.id.characterDataContainer,
-                ParticularCharacterFragment.newInstance(0L),
+                ParticularCharacterFragment.newInstance(App.INSTANCE.state?.lastOpenedCharacterId),
+                ParticularCharacterFragment.TAG
+            )
+        }
+
+        if (App.INSTANCE.state?.lastOpenedCharacterId != 0L && App.INSTANCE.state != null && !isDataContainerAvailable()) {
+            supportFragmentManager.popBackStack(
+                BACK_STACK_ITEM_NAME,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+            createFragment(
+                R.id.characterListContainer,
+                ParticularCharacterFragment.newInstance(
+                    App.INSTANCE.state?.lastOpenedCharacterId
+                ),
                 ParticularCharacterFragment.TAG
             )
         }

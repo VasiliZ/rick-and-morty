@@ -7,12 +7,20 @@ class InsertValueHelper {
 
     companion object {
         private const val INSERT_OPERATION = "insert into "
+        private const val OPEN_BRACKET = "("
+        private const val CLOSE_BRACKET = ")"
         private const val VALUES = "VALUES"
     }
 
     fun table(tableName: String) {
         listWithPartsOfQuery.add(INSERT_OPERATION)
         listWithPartsOfQuery.add(tableName)
+    }
+
+    fun fields(fieldsName: String) {
+        listWithPartsOfQuery.add(OPEN_BRACKET)
+        listWithPartsOfQuery.add(fieldsName)
+        listWithPartsOfQuery.add(CLOSE_BRACKET)
     }
 
     fun values(values: String) {
