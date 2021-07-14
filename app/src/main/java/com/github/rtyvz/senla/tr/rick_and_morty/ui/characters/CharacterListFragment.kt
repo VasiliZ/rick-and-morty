@@ -102,6 +102,11 @@ class CharacterListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
+        val state = App.INSTANCE.state
+        if (state != null && state.characterEntityList.isEmpty()) {
+            TasksProvider.provideTaskForLoadCharacters(state.currentPage)
+        }
+
         registerCharacterReceiver()
         registerLoadingErrorReceiver()
     }
