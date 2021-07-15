@@ -153,7 +153,7 @@ class ParticularCharacterFragment : Fragment() {
     private fun setData(character: CharacterEntity?) {
         Glide
             .with(this)
-            .load(character?.image)
+            .load(character?.imageUrl)
             .into(image)
         nameTextView.text = character?.name
         genderTextView.text = character?.gender

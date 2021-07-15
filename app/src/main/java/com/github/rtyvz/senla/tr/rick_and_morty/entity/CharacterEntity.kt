@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class CharacterEntity(
     val id: Long? = null,
-    val image: String? = null,
+    val imageUrl: String? = null,
     val name: String? = null,
     val gender: String? = null,
     val status: String? = null,

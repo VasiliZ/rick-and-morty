@@ -3,14 +3,16 @@ package com.github.rtyvz.senla.tr.rick_and_morty.ui.characters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.github.rtyvz.senla.tr.rick_and_morty.R
 import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 
 class CharacterAdapter(
+    private val glide: RequestManager,
     private val click: (Long) -> (Unit)
 ) :
     RecyclerView.Adapter<CharacterAdapter.BaseViewHolder>() {
@@ -26,6 +28,7 @@ class CharacterAdapter(
         return when (viewType) {
             DATA_VIEW_TYPE -> {
                 CharacterHolder(
+                    glide,
                     LayoutInflater.from(parent.context)
                         .inflate(R.layout.character_item, parent, false)
                 ).apply {
@@ -55,6 +58,12 @@ class CharacterAdapter(
         }
     }
 
+    override fun onViewRecycled(holder: BaseViewHolder) {
+        holder.clear()
+
+        super.onViewRecycled(holder)
+    }
+
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder.bind(characterList[position])
     }
@@ -73,58 +82,25 @@ class CharacterAdapter(
         notifyItemRemoved(characterList.size - 1)
     }
 
-    class CharacterHolder(private val view: View) :
+    class CharacterHolder(private val glide: RequestManager, private val view: View) :
         BaseViewHolder(view) {
         private lateinit var nameTextView: MaterialTextView
-        private lateinit var genderTextView: MaterialTextView
-        private lateinit var statusTextView: MaterialTextView
-        private lateinit var locationTextView: MaterialTextView
-        private lateinit var typeTextView: MaterialTextView
-        private lateinit var statusImageView: ShapeableImageView
-
-        companion object {
-            private const val ALIVE_STATUS = "Alive"
-            private const val DEAD_STATUS = "Dead"
-        }
+        private lateinit var characterImage: ShapeableImageView
 
         override fun bind(data: CharacterEntity) {
             nameTextView = view.findViewById(R.id.characterName)
-            genderTextView = view.findViewById(R.id.genderTextView)
-            statusImageView = view.findViewById(R.id.statusImageView)
-            statusTextView = view.findViewById(R.id.statusTextView)
-            locationTextView = view.findViewById(R.id.locationTextView)
-            typeTextView = view.findViewById(R.id.characterTypeTextView)
+            characterImage = view.findViewById(R.id.characterImage)
 
             nameTextView.text = data.name
-            genderTextView.text = data.gender
-            statusTextView.text = data.status
-            statusImageView.setBackgroundColor(
-                ResourcesCompat.getColor(
-                    view.resources,
-                    when (data.status) {
-                        ALIVE_STATUS ->
-                            R.color.alive_color
-                        DEAD_STATUS -> R.color.dead_color
-                        else -> R.color.unknown_color
-                    },
-                    null
-                )
-            )
-
-            if (data.type.isNullOrBlank()) {
-                typeTextView.visibility = View.GONE
-            } else {
-                typeTextView.visibility = View.VISIBLE
-                typeTextView.text =
-                    formatString(data.type, view, R.string.character_adapter_type)
-            }
-
-            locationTextView.text =
-                formatString(data.location, view, R.string.character_adapter_location)
+            glide
+                .load(data.imageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .into(characterImage)
         }
 
-        private fun formatString(value: String?, view: View, resourceId: Int) =
-            String.format(view.context.getString(resourceId), value)
+        override fun clear() {
+            glide.clear(characterImage)
+        }
     }
 
     fun setData(data: List<CharacterEntity>) {
@@ -132,12 +108,18 @@ class CharacterAdapter(
         notifyDataSetChanged()
     }
 
+    fun clearData(){
+        characterList.clear()
+        notifyDataSetChanged()
+    }
+
     class LoadingViewHolder(view: View) : BaseViewHolder(view) {
-        override fun bind(data: CharacterEntity) {
-        }
+        override fun bind(data: CharacterEntity) {}
+        override fun clear() {}
     }
 
     abstract class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(data: CharacterEntity)
+        abstract fun clear()
     }
 }

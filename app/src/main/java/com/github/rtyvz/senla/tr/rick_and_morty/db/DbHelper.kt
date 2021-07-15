@@ -22,7 +22,7 @@ class DbHelper {
             }.insert(
                 DBProvider.provideDb(), listOf<Any?>(
                     character.id,
-                    character.image,
+                    character.imageUrl,
                     character.name,
                     character.gender,
                     character.status,
