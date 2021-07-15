@@ -100,6 +100,7 @@ class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegative
                 finish()
             }
             else -> {
+                App.INSTANCE.state?.lastOpenedCharacterId = 0L
                 supportFragmentManager.popBackStack(
                     BACK_STACK_ITEM_NAME,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -118,6 +119,7 @@ class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegative
                         true
                     }
                     else -> {
+                        App.INSTANCE.state?.lastOpenedCharacterId = 0L
                         supportFragmentManager.popBackStack(
                             BACK_STACK_ITEM_NAME,
                             FragmentManager.POP_BACK_STACK_INCLUSIVE
