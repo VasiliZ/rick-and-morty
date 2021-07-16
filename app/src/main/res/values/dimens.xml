@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--padding-->
+    <dimen name="small_padding">8dp</dimen>
+
+    <!--margin-->
+    <dimen name="extra_small_margin">4dp</dimen>
+    <dimen name="small_margin">8dp</dimen>
+
+    <!--size-->
+    <dimen name="small_image_size">60dp</dimen>
+    <dimen name="photo_height_normal">350dp</dimen>
+    <dimen name="photo_size_land">200dp</dimen>
+    <dimen name="photo_height_big">450dp</dimen>
+    <dimen name="round_small_image_size">20dp</dimen>
+
+    <!--text size-->
+    <dimen name="body_text_size">16sp</dimen>
+
+    <!--radius-->
+    <dimen name="card_corner_radius">12dp</dimen>
+</resources>

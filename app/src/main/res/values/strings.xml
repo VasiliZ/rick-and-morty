@@ -1,3 +1,19 @@
 <resources>
-    <string name="app_name">rick-and-morty</string>
+    <string name="app_name">Rick and Morty</string>
+
+    <!--Character fragment-->
+    <string name="character_list_fragment_wait_label">Wait please</string>
+    <string name="character_adapter_location">Location: %s</string>
+    <string name="character_adapter_type">Type: %s</string>
+
+    <!--particular fragment-->
+    <string name="particular_character_fragment_data_is_empty">"Haven't got data for display"</string>
+
+    <!--task-->
+    <string name="task_fetching_error">Failed to load data</string>
+    <string name="dialog_retry_load">Failed to load data, try again?</string>
+
+    <!--dialog-->
+    <string name="dialog_ok_label">Yes</string>
+    <string name="dialog_no_label">No</string>
 </resources>
