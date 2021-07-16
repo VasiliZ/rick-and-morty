@@ -23,6 +23,7 @@ import com.github.rtyvz.senla.tr.rick_and_morty.common.PaginationScrollListener
 import com.github.rtyvz.senla.tr.rick_and_morty.entity.CharacterEntity
 import com.github.rtyvz.senla.tr.rick_and_morty.provider.TasksProvider
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.dialog.ErrorLoadListCharactersDialogFragment
+import com.github.rtyvz.senla.tr.rick_and_morty.ui.particularCharacter.HomeButtonBehaviorContract
 import com.google.android.material.textview.MaterialTextView
 import java.util.Collections.emptyList
 
@@ -67,6 +68,7 @@ class CharacterListFragment : Fragment() {
 
         val state = App.INSTANCE.state
         this.state = state
+
         if (state != null) {
             when {
                 !state.isCharacterTaskRunning && state.characterEntityList.isEmpty() -> {
@@ -105,6 +107,7 @@ class CharacterListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
+        (activity as HomeButtonBehaviorContract).disableHomeButton()
         val state = App.INSTANCE.state
         if (state != null && state.characterEntityList.isEmpty() && !state.isCharacterTaskRunning) {
             progress?.show()

@@ -14,11 +14,12 @@ import com.github.rtyvz.senla.tr.rick_and_morty.ui.characters.CharacterListFragm
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.dialog.HandleClickErrorLoadCharactersDialog
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.dialog.HandleClickErrorLoadSingleCharacter
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.particularCharacter.HandleNegativeButtonDialogClick
+import com.github.rtyvz.senla.tr.rick_and_morty.ui.particularCharacter.HomeButtonBehaviorContract
 import com.github.rtyvz.senla.tr.rick_and_morty.ui.particularCharacter.ParticularCharacterFragment
 
 class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegativeButtonDialogClick,
     HandleClickErrorLoadSingleCharacter,
-    HandleClickErrorLoadCharactersDialog {
+    HandleClickErrorLoadCharactersDialog, HomeButtonBehaviorContract {
     private var dataContainer: FragmentContainerView? = null
 
     companion object {
@@ -32,16 +33,13 @@ class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegative
         setContentView(R.layout.character_activity)
 
         dataContainer = findViewById(R.id.characterDataContainer)
-
+        setSupportActionBar(findViewById(R.id.toolBar))
         val state = App.INSTANCE.state
         createFragmentsFromOrientation(state)
 
         if (state == null) {
             App.INSTANCE.state = State()
         }
-
-        actionBar?.setDisplayHomeAsUpEnabled(true)
-        actionBar?.setHomeButtonEnabled(true)
     }
 
     private fun createFragmentsFromOrientation(state: State?) {
@@ -57,7 +55,9 @@ class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegative
             )
         }
 
-        if (App.INSTANCE.state?.lastOpenedCharacterId != 0L && App.INSTANCE.state != null && !isDataContainerAvailable()) {
+        if (App.INSTANCE.state?.lastOpenedCharacterId != 0L && App.INSTANCE.state != null
+            && !isDataContainerAvailable()
+        ) {
             supportFragmentManager.popBackStack(
                 BACK_STACK_ITEM_NAME,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -190,6 +190,18 @@ class CharactersActivity : AppCompatActivity(), ActivityContract, HandleNegative
         val fragment = supportFragmentManager.findFragmentByTag(ParticularCharacterFragment.TAG)
         if (fragment is ParticularCharacterFragment) {
             fragment.negativeAction()
+        }
+    }
+
+    override fun enableHomeButton() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
+    }
+
+    override fun disableHomeButton() {
+        if (!isDataContainerAvailable()) {
+            supportActionBar?.setDisplayHomeAsUpEnabled(false)
+            supportActionBar?.setHomeButtonEnabled(false)
         }
     }
 }

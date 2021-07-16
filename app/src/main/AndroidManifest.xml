@@ -13,9 +13,9 @@
         android:theme="@style/Theme.Rickandmorty">
         <activity
             android:name=".ui.main.CharactersActivity">
-            <meta-data
+           <!-- <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.main.CharactersActivity"/>
+                android:value=".ui.main.CharactersActivity"/>-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -73,6 +73,7 @@ class ParticularCharacterFragment : Fragment() {
 
         localBroadcastManager = LocalBroadcastManager.getInstance(requireContext())
 
+        (activity as HomeButtonBehaviorContract).enableHomeButton()
         initCharacterReceiver()
         initCharacterErrorReceiver()
         prepareToLoadCharacter(
@@ -229,4 +230,9 @@ class ParticularCharacterFragment : Fragment() {
 
 interface HandleNegativeButtonDialogClick {
     fun popBackStack()
+}
+
+interface HomeButtonBehaviorContract {
+    fun enableHomeButton()
+    fun disableHomeButton()
 }
